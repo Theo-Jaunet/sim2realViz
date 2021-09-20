@@ -1,0 +1,2491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>Sim2Real</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="static/assets/css/normalize.css">
+    <link rel="stylesheet" href="static/assets/css/skeleton.css">
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="static/assets/images/favicon/favicon.ico">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="/static/assets/js/make_data.js"></script>
+    <script src="/static/assets/js/data_handler.js"></script>
+    <script src="/static/assets/js/main.js"></script>
+    <script src="/static/assets/js/glyph_handler.js"></script>
+    <script src="/static/assets/js/stats_handler.js"></script>
+
+
+    <style>
+
+        /*    transform-box: fill-box;*/
+        /*}*/
+
+        .modRect {
+
+            cursor: pointer;
+        }
+
+        .seled {
+
+            fill: indigo;
+            z-index: 999;
+        }
+
+
+        .selRect {
+            stroke-width: 3px;
+            fill: #555555 !important;
+        }
+
+        .modRect:hover {
+            fill: #555555;
+        }
+
+        .modRect {
+            fill: rgba(170, 170, 170, 0.33);
+        }
+
+        .ramp_lab {
+            position: absolute;
+            margin-top: -5px;
+        }
+
+        .imgbig {
+            width: 120px;
+            height: 120px;
+            border: #555555 solid 0.5px;
+
+        }
+
+
+        body {
+
+            user-select: none;
+        }
+
+        option {
+            cursor: pointer;
+        }
+
+
+        .sel {
+
+            fill: #555555
+        }
+
+        .selReal {
+            fill: darkred;
+        }
+
+        .selSim {
+            fill: indigo;
+
+        }
+
+
+        .arrow {
+
+            stroke: #555555;
+            stroke-width: 3px;
+
+        }
+
+        .slide {
+            text-align: center;
+            width: 100px;
+        }
+
+        /*input[type=range][orient=vertical] {*/
+        /*    writing-mode: bt-lr; !* IE *!*/
+        /*    -webkit-appearance: slider-vertical; !* WebKit *!*/
+        /*    width: 8px;*/
+        /*    height: 120px;*/
+        /*    padding: 0 5px;*/
+        /*    margin-top: 20px;*/
+        /*}*/
+
+        /*   ---------------------  Range */
+
+
+        .__range input {
+            outline: none;
+            -webkit-appearance: none;
+            background-color: #aaa;
+            height: 6px;
+            width: 98%;
+            margin: 10px auto;
+            cursor: pointer;
+        }
+
+        .__range input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: #1EAEDB;
+            border-radius: 50%;
+            cursor: -moz-grab;
+            cursor: -webkit-grab;
+            cursor: pointer;
+        }
+
+        .__range input::-moz-range-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: #1EAEDB;
+            border-radius: 50%;
+            cursor: -moz-grab;
+            cursor: -webkit-grab;
+        }
+
+        .__range input::-ms-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: #1EAEDB;
+            border-radius: 50%;
+            cursor: -moz-grab;
+            cursor: -webkit-grab;
+        }
+
+        .__range-step {
+            position: relative;
+        }
+
+        .__range-max {
+            float: right;
+        }
+
+        .__range-step input::-webkit-slider-thumb {
+            background: transparent;
+        }
+
+        .__range-step input::-moz-range-thumb {
+            background: transparent;
+        }
+
+        .__range-step input::-ms-thumb {
+            background: transparent;
+        }
+
+        .__range-step datalist {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            height: auto;
+            bottom: 21px;
+            /* disable text selection */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+/Edge */
+            user-select: none; /* Standard */
+            /* disable click events */
+            pointer-events: none;
+            text-indent: -8px;
+            cursor: pointer;
+        }
+
+        .__range-step datalist option {
+            width: 10px;
+            height: 10px;
+            min-height: 10px;
+            border-radius: 100px;
+            /* hide text */
+            white-space: nowrap;
+            padding: 5px;
+            line-height: 50px;
+            cursor: pointer;
+            margin-left: -3px;
+            margin-top: -2px;
+        }
+
+
+        .__range-step-popup output {
+            position: absolute;
+            background-color: #1EAEDB;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            color: white;
+            border-radius: 100px;
+            display: inline-block;
+            font-size: 12px;
+            bottom: 100%;
+            left: 0;
+            vertical-align: middle;
+            line-height: 30px;
+        }
+
+        .__range-step-popup .__range-output-square {
+            padding: 0 5px;
+            min-width: 25px;
+            width: auto !important;
+            border-radius: 5px !important;
+        }
+
+        .__range-step-popup output:after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #FFF;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            top: 90%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -1px;
+        }
+
+        .__range-step-popup datalist {
+            overflow: hidden;
+        }
+
+        .__range-step {
+            margin: 0 40px;
+        }
+
+        .__range-step-popup {
+            margin: 40px 40px;
+        }
+
+        input::-webkit-calendar-picker-indicator {
+            display: none; /* remove default arrow */
+        }
+
+
+        .imgsTitle {
+            font-size: 13pt;
+            /*margin-left: 50%;*/
+            margin: 0;
+            /*width: fit-content;*/
+            text-anchor: middle;
+            display: inline-block;
+            width: 100%;
+        }
+
+
+        .button-primary {
+            background-color: #FFF !important;
+            color: #273d4d !important;
+            padding: 0 12px;
+            border: #555555 solid 1px;
+        }
+
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 15px;
+        }
+
+        console.
+        log
+
+        (
+        img
+
+        )
+        ;
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            z-index: 999;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: -2px;
+            bottom: -2px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 15px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        /*.selectedMethod {*/
+        /*    !*background-color: #e8d9d99e;*!*/
+        /*    border: thin  #273d4d;*/
+        /*                background-color: rgba(38, 101, 119, 0.21);*/
+        /*    border-radius: 5%;*/
+        /*}*/
+
+        /*.method:hover {*/
+        /*    cursor: pointer;*/
+        /*    background-color: rgba(39, 61, 77, 0.47);*/
+        /*           border: solid 2px #273d4d;*/
+
+
+        /*}*/
+
+        #stats_bar rect {
+            cursor: pointer;
+        }
+
+
+        #stats_orr path:hover {
+            cursor: pointer;
+            fill: #555555
+        }
+
+
+        #overview circle:hover {
+            cursor: pointer;
+            fill: #555555
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div style="position: absolute;top: 55px;left: 15px">
+    <div style="display: inline-block"><img id="shift" src="static/assets/images/shift.svg" style="height: 30px"> <span
+            style="font-weight: 600;font-size: 16pt;position: absolute;top: 0px;left:56px">⩂</span></div>
+    <div style="display: inline-block;margin-left: 30px"><img id="ctrl" src="static/assets/images/ctrl.svg"
+                                                              style="height: 30px"> <span
+            style="font-weight: 600;font-size: 16pt;position: absolute;top: 0px;left:140px">⩃</span></div>
+    <div style="display: inline-block;margin-left: 30px"><img id="alt" src="static/assets/images/alt.svg"
+                                                              style="height: 30px"> <span
+            style="font-weight: 600;font-size: 16pt;position: absolute;top: 0px;left:220px">∉</span></div>
+</div>
+<!-- Primary Page Layout
+–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+<div style="width: 100vw;height: 50px;border: solid 1px #555555;background-color: #273d4d">
+    <div style="font-weight: bolder;font-size: 22pt;color: #FFF;display: inline-block; margin-left:16px;margin-top: 2px;vertical-align: middle;padding-right: 15px;border-right: solid 1px #fff ">
+        Sim2RealVis
+    </div>
+    <div style="width: 140px; display: inline-block;margin-left: 10px">
+        <select class="u-full-width" id="datasets"
+                style="height: auto;cursor: pointer;display: inline">
+            <option value="0">Trajectory#1</option>
+            <option value="1">Trajectory#2</option>
+            <!--            <option value="feat">Feature Dist</option>-->
+        </select>
+    </div>
+    <div style="display: inline-block;color: #FFF;    margin-left: 40px;">
+        <p style="font-weight: 600;width: 200px">
+
+            <span id="nbInst" style="font-family:monospace "> --/--</span> <span> Instances selected</span>
+        </p>
+    </div>
+    <div style=" display: inline-block;margin-top: 0;margin-left: 15px">
+        <button class="button-primary" id="resQ"> Reset</button>
+        <!--        <button class="button-primary" id="prevQ"> Previous</button>-->
+    </div>
+
+    <div style="display: inline-block;margin-right: auto;margin-top: auto;    margin-left: 80px;">
+        <button class="button button-primary" id="clipbtn"> Clip</button>
+        <select class="u-full-width" id="heater"
+                style="height: auto;cursor: pointer;display: inline;width: 125px">
+            <option value="feat">Feature Dist</option>
+            <option value="cam">Activation</option>
+            <option value="occlu">Occlusion</option>
+
+        </select>
+        <button class="button button-primary" id="heatbtn"> Make-Heat</button>
+        <input type="range" min="5" max="150" step="1" value="31" id="clip_radius" style="display: none">
+        <input type="range" min="0" max="1" step="0.1" value="0.162" id="bg_opa" style="display: none">
+    </div>
+
+    <div style="display:inline-block;width:130px;margin-right: 30px;margin-top: 0px;position: absolute"
+         class="__range __range-step">
+        <input type="range" min="0" max="2" value="2" id="kmod" style="width: 130px" list="ticks1">
+
+        <datalist id="ticks1" style="color: #FFFFFF">
+            <option value="0">Full</option>
+            <option value="1">Glyph</option>
+            <option value="2">Color</option>
+
+        </datalist>
+        <!--                        <p style="display: inline-block"> min</p>-->
+        <!--                        <p style="display: inline-block"> med</p>-->
+        <!--                        <p style="display: inline-block"> max</p>-->
+    </div>
+    <div style="text-align: center;display: inline-block;margin-top: 5px; margin-left: 250px">
+
+        <button id="adj_btn_sim" class="button button-primary" style="display: inline-block"> Adjust Sim</button>
+        <button id="adj_btn_real" class="button button-primary" style="display: inline-block"> Adjust Real</button>
+        <div style="display: inline-block">
+            <p style="color: white;position: absolute;top:0px;margin-left:25px;font-weight: 600"> Heatmap</p>
+            <label class="switch" style="top: 15px;left:35px">
+                <input type="checkbox" id="heatBool" checked>
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </div>
+</div>
+
+
+<div class="container" style="width: 1600px;max-width: 1600px;position:relative;margin-top: 40px">
+
+    <!--    <h1 style="text-align: center;margin-top: 34px;margin-left: 345px;margin-bottom: 5px"> Sim2RealVis</h1>-->
+    <!--<div class="row">-->
+    <!--    <div class="six column" style="margin-top:1%;margin-bottom: 1%;position:relative;margin-left: -5%">-->
+
+
+    <!--    </div>-->
+
+    <!--</div>-->
+    <div class="row" style="margin: auto;width :1600px;position: relative">
+
+
+        <div class="five columns" style="margin-top: 2.5%;position: relative;margin-left: -9%">
+            <h5 style="position: absolute;text-anchor: middle;display: inline;left:110px;margin-top: -30px ">
+                Simulation</h5>
+            <h5 style="position: absolute;text-anchor: middle;display: inline;left: 480px;margin-top: -30px">
+                Reality</h5>
+
+            <!--            <input type="range" orient="vertical" min="0" max="1" step="0.1" value="1" style="float: left"-->
+            <!--                   id="sim_diff"/>-->
+            <div style="display: flex;align-items: center;position: absolute;left: 220px;top:-25px">
+                <button style="height: 25px;padding: 3px;line-height: initial;width: 32px" id="s_min_par">min</button>
+                <button style="height: 25px;padding: 3px;line-height: initial;width: 32px" id="s_max_par">max</button>
+                <button style="height: 25px;padding: 3px;line-height: 25px;width: 21px" id="sim_str">
+                    <img src="static/assets/images/straight.png" style="height:20px">
+                </button>
+                <button style="height: 25px;padding: 3px;line-height: 25px" id="sim_curv">
+                    <img src="static/assets/images/curved.png" style="height:20px">
+                </button>
+            </div>
+            <div style="display: flex;align-items: center;position: absolute;left: 359px;top:-25px">
+                <button style="height: 25px;padding: 3px;line-height: 25px;width: 21px" id="real_str">
+                    <img src="static/assets/images/straight.png" style="height:20px">
+                </button>
+                <button style="height: 25px;padding: 3px;line-height: 25px" id="real_curv">
+                    <img src="static/assets/images/curved.png" style="height:20px">
+                </button>
+                <button style="height: 25px;padding: 3px;line-height: initial;width: 32px" id="r_min_par">min</button>
+                <button style="height: 25px;padding: 3px;line-height: initial;width: 32px" id="r_max_par">max</button>
+            </div>
+            <svg id="overview" style="width:680px;height: 420px;margin-top: -24px;border-bottom: solid 2px #5555"></svg>
+            <!--            <input type="range" orient="vertical" min="0" max="1" step="0.1" value="1" style="float: right"-->
+            <!--                   id="real_diff"/>-->
+
+            <div>
+                <svg width="680" height="180" id="stats_orr" style="margin-top: 10px">
+
+                </svg>
+                <svg width="680" height="180" id="stats_bar" style="margin-top: 15px">
+
+                </svg>
+
+            </div>
+
+
+        </div>
+
+        <div class="five columns" style="margin-top: 1%;text-align: center;margin-left: 5%">
+
+            <svg id="main" style="width: 812px;height: 810px; border: solid #555555 1px"
+                 preserveAspectRatio="xMinYMin meet" viewBox="0 0 650 650"></svg>
+
+            <div style="width: 810px;vertical-align: middle;display: inline-block;position: relative">
+                <div style="position: absolute;width: 228px;left: 0;top:-20px ">
+                    <p style="margin-bottom: -2px">Distance Sim/Real (meters)</p>
+                    <canvas style="width:100%;height: 18px;margin-left: 0px" id="ramp"></canvas>
+                    <span class="ramp_lab" style="left: 1px"> 0 </span>
+                    <span class="ramp_lab" style="left: 49%"> 5 </span>
+                    <span class="ramp_lab" style="right:-1px"> 10</span>
+
+                </div>
+
+                <div style="position: absolute;width: 228px;right: 0;top:-20px ">
+                    <p style="margin-bottom: -2px">Heatmaps</p>
+                    <canvas style="width:100%;height: 18px;margin-left: 0px" id="ramp_turbo"></canvas>
+                    <span class="ramp_lab" style="left: 1px"> 0 </span>
+                    <span class="ramp_lab" style="left: 49%"> 0.5 </span>
+                    <span class="ramp_lab" style="right:-1px"> 1</span>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="two columns" style="position: absolute;right: 0">
+
+
+            <div style="text-align: center;min-height: 200px;position: relative;text-align: center;margin-top: -3.3%;">
+
+
+                <div id="activ" style="width: 268px" class="selectedMethod">
+                    <h4 style="" class="imgsTitle"> Activation </h4>
+                    <div id="activ_sim_imgs"
+                         style="width: 100px; height: 150px;margin-right: 30px;display: inline-block;text-align: center ;   margin-left: -22.5px;">
+
+                        <img id="activ_sim_sal" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">
+                        <img id="activ_sim_rgb" class="imgbig">
+
+                        <img id="activ_sim_depth_sal" class="imgbig"
+                             style="opacity: 0.15;position: absolute;z-index: 99">
+                        <img id="activ_sim_depth" class="imgbig">
+
+                    </div>
+                    <div id="activ_real_imgs" style="width: 100px; height: 150px; display: inline-block">
+                        <img id="activ_real_sal" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">
+                        <!--                    <img id="real_occlu" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">-->
+                        <img id="activ_real_rgb" class="imgbig realIm">
+                        <img id="activ_real_depth_sal" class="imgbig"
+                             style="opacity: 0.15;position: absolute;z-index: 99">
+                        <!--                    <img id="real_occlu_depth" class="imgbig" style="opacity: 0.3;position: absolute">-->
+                        <img id="activ_real_depth" class="imgbig realImDepth">
+
+                    </div>
+                </div>
+
+                <div id="occlu" style="width: 268px">
+                    <h4 class="imgsTitle"> Occlusion </h4>
+                    <div id="occlu_sim_imgs"
+                         style="width: 100px; height: 150px;margin-right: 30px;display: inline-block;text-align: center   ; margin-left: -22.5px;">
+
+                        <img id="occlu_sim_sal" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">
+                        <img id="occlu_sim_rgb" class="imgbig">
+
+                        <img id="occlu_sim_depth_sal" class="imgbig"
+                             style="opacity: 0.15;position: absolute;z-index: 99">
+                        <img id="occlu_sim_depth" class="imgbig">
+
+                    </div>
+                    <div id="real_imgs" style="width: 100px; height: 150px; display: inline-block">
+                        <img id="occlu_real_sal" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">
+                        <!--                    <img id="real_occlu" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">-->
+                        <img id="occlu_real_rgb" class="imgbig realIm">
+                        <img id="occlu_real_depth_sal" class="imgbig"
+                             style="opacity: 0.15;position: absolute;z-index: 99">
+                        <!--                    <img id="real_occlu_depth" class="imgbig" style="opacity: 0.3;position: absolute">-->
+                        <img id="occlu_real_depth" class="imgbig realImDepth">
+
+                    </div>
+                </div>
+
+
+                <div id="feat" style="width: 268px">
+                    <h4 class="imgsTitle"> Feature Dist </h4>
+                    <div id="feat_sim_imgs"
+                         style="width: 100px; height: 150px;margin-right: 30px;display: inline-block;text-align: center;    margin-left: -22.5px;">
+
+                        <img id="feat_sim_sal" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">
+                        <img id="feat_sim_rgb" class="imgbig">
+
+                        <img id="feat_sim_depth_sal" class="imgbig"
+                             style="opacity: 0.15;position: absolute;z-index: 99">
+                        <img id="feat_sim_depth" class="imgbig">
+
+                    </div>
+                    <div id="feat_real_imgs" style="width: 100px; height: 150px; display: inline-block">
+                        <img id="feat_real_sal" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">
+                        <!--                    <img id="real_occlu" class="imgbig" style="opacity: 0.3;position: absolute;z-index: 99">-->
+                        <img id="feat_real_rgb" class="imgbig realIm">
+                        <img id="feat_real_depth_sal" class="imgbig"
+                             style="opacity: 0.15;position: absolute;z-index: 99">
+                        <!--                    <img id="real_occlu_depth" class="imgbig" style="opacity: 0.3;position: absolute">-->
+                        <img id="feat_real_depth" class="imgbig realImDepth">
+                    </div>
+                </div>
+
+                <div id="adj_img_real"
+                     style="text-align: center;position: absolute;top:275px;display: none;margin-left: 160px">
+                    <label for="r_bright">Brightness</label>
+                    <input type="range" min="0" max="2" step="0.1" id="r_bright" class="slide real_rgb_slide">
+                    <label for="r_contrast">Contrast</label>
+                    <input type="range" min="0" max="2" step="0.1" id="r_contrast" class="slide real_rgb_slide">
+
+                    <label for="r_white">White Balance</label>
+                    <input type="range" min="-0.5" max="0.5" step="0.1" id="r_white" class="slide real_rgb_slide"
+                           value="0">
+
+
+                    <label for="r_drange">Dynamic Range</label>
+                    <input type="range" min="0" max="2" step="0.1" id="r_drange" class="slide real_depth_slide">
+                    <label for="r_dblur">Blur</label>
+                    <input type="range" min="0" max="1" value="0" step="0.1" id="r_dblur"
+                           class="slide real_depth_slide">
+
+                    <button class="button-primary" id="adjAll_real"> Apply</button>
+                </div>
+
+
+                <div id="adj_img_sim"
+                     style="text-align: center;position: absolute;top:275px;display: none;margin-left: 160px">
+                    <label for="s_pitch">Pitch</label>
+                    <input type="range" value="-0.015" min="-0.5" max="0.5" step="0.01" id="s_pitch"
+                           class="slide sim_rgb_slide">
+                    <label for="s_yaw">Yaw</label>
+                    <input type="range" min="-1" max="1" value="0.589" step="0.01" id="s_yaw"
+                           class="slide sim_rgb_slide">
+
+                    <label for="s_roll">Roll</label>
+                    <input type="range" min="-0.5" max="0.5" step="0.01" value="0.047" id="s_roll"
+                           class="slide sim_rgb_slide"
+                    >
+
+
+                    <label for="s_rfov">RGB FoV</label>
+                    <input type="range" min="30" max="105" step="1" id="s_rfov" class="slide sim_rgb_slide"
+                           value="56">
+
+                    <label for="s_dfov">Depth FoV</label>
+                    <input type="range" min="30" max="105" step="1" id="s_dfov" class="slide sim_rgb_slide"
+                           value="80">
+
+
+                    <button class="button-primary" id="adjAll_sim"> Apply</button>
+                </div>
+                <!--                <div style="text-align: center;position: absolute;left: 34%;display: flex;margin-top: 5px">
+
+                                    <button id="adj_btn" class="button button-primary"> Adjust</button>
+                                    <div>
+                                        <label for="heater" style="margin-bottom: 0;height: 25px;cursor: pointer;display: inline-block">
+                                            <label class="example-send-yourself-copy" style="cursor: pointer">
+                                                <input type="checkbox" id="heatBool" checked style="margin-left: 65px">
+                                                <span class="label-body"
+                                                      style="font-weight: 600;cursor: pointer;position: absolute;top:15px;right: -30px">Heatmap</span>
+                                            </label>
+                                        </label>
+                                    </div>
+                                </div>-->
+            </div>
+        </div>
+    </div>
+
+
+    <!--<div class="row">-->
+
+
+    <!--    <div style="text-align: center">-->
+
+
+    <!--    </div>-->
+    <!--</div>-->
+
+
+    <!--<canvas id="tempCan" width="256" height="256" style="display: none">-->
+
+    <!--</canvas>-->
+
+    <!--</div>-->
+
+
+    <script>
+
+        let bg_opa = 0.15
+        let path = d3.geoPath()
+        let disp_heat = true
+
+
+        function lasso() {
+            const dispatch = d3.dispatch("start", "lasso", "end");
+            const lasso = function (selection) {
+                const node = selection.node();
+                const polygon = [];
+
+                selection
+                    .on("touchmove", e => e.preventDefault()) // prevent scrolling
+                    .on("pointerdown", e => {
+                        console.log(e);
+                        if (e.offsetY > 190) {
+                            trackPointer(e, {
+                                start: p => {
+                                    d3.selectAll(".lasso").style("opacity", 1)
+                                    polygon.length = 0;
+                                    dispatch.call("start", node, polygon);
+                                },
+                                move: p => {
+                                    d3.selectAll(".lasso").style("opacity", 1)
+                                    polygon.push(p.point);
+                                    dispatch.call("lasso", node, polygon);
+                                },
+                                end: p => {
+                                    d3.selectAll(".lasso").style("opacity", 0)
+                                    dispatch.call("end", node, polygon);
+                                }
+                            });
+                        }
+                    });
+            };
+            lasso.on = function (type, _) {
+                return _ ? (dispatch.on(...arguments), lasso) : dispatch.on(...arguments);
+            };
+
+            return lasso;
+        }
+
+
+        function trackPointer(e, {start, move, out, end}) {
+            const tracker = {},
+                id = (tracker.id = e.pointerId),
+                target = e.target;
+            tracker.point = d3.pointer(e, target);
+            target.setPointerCapture(id);
+
+            d3.select(target)
+                .on(`pointerup.${id} pointercancel.${id}`, e => {
+                    if (e.pointerId !== id) return;
+                    tracker.sourceEvent = e;
+                    d3.select(target).on(`.${id}`, null);
+                    target.releasePointerCapture(id);
+                    end && end(tracker);
+                })
+                .on(`pointermove.${id}`, e => {
+                    if (e.pointerId !== id) return;
+                    tracker.sourceEvent = e;
+                    tracker.prev = tracker.point;
+                    tracker.point = d3.pointer(e, target);
+                    move && move(tracker);
+                })
+                .on(`pointerout.${id}`, e => {
+                    if (e.pointerId !== id) return;
+                    tracker.sourceEvent = e;
+                    tracker.point = null;
+                    out && out(tracker);
+                });
+
+            start && start(tracker);
+        }
+
+
+        function Enddraw(polygon) {
+            let r_dots = d3.selectAll("#overview .realdots")
+            let s_dots = d3.selectAll("#overview .simdots")
+            let space = 20;
+            let width = parseInt(d3.select("#overview").style("width").replace("px", ""))
+
+            let proj_realx = megaData[selMod]["real_dots"].map(d => d["proj"][0])
+            let proj_realy = megaData[selMod]["real_dots"].map(d => d["proj"][1])
+            let xScale2 = d3.scaleLinear(d3.extent(proj_realx), [width / 2 + space, width]).clamp(true).nice();
+            // let xScale2 = d3.scaleLinear([1, 0.2], [width / 2 + space, width]).clamp(true).nice();
+            let yScale2 = d3.scaleLinear(d3.extent(proj_realy), [230, 390]).clamp(true).nice();
+
+            let proj_simx = megaData[selMod]["sim_dots"].map(d => d["proj"][0])
+            let proj_simy = megaData[selMod]["sim_dots"].map(d => d["proj"][1])
+
+            let xScale = d3.scaleLinear(d3.extent(proj_simx), [0, width / 2 - space]).clamp(true).nice();
+            let yScale = d3.scaleLinear(d3.extent(proj_simy), [230, 390]).clamp(true).nice();
+
+
+            let svg = d3.select("#overview").node()
+
+            d3.selectAll("#overview .lasso").datum({
+                type: "LineString",
+                coordinates: polygon
+            }).attr("d", path);
+
+
+            // console.log();
+
+            const selected = polygon.length > 2 ? [] : megaData[selMod]["real_dots"].map(d => [xScale2(d["proj"][0]), yScale2(d["proj"][1])]);
+
+            // note: d3.polygonContains uses the even-odd rule
+            // which is reflected in the CSS for the lasso shape
+            // console.log(r_dots);
+
+            r_dots.attr("class", "realdots")
+
+            let t_dots = r_dots.filter((d, i) => {
+                // console.log("alala");
+                if (polygon.length > 2) {
+                    let elem = megaData[selMod]["real_dots"][i]
+                    let coords = [xScale2(elem["proj"][0]), yScale2(elem["proj"][1])]
+
+                    // console.log(coords);
+
+
+                    return (d3.polygonContains(polygon, coords) && selected.push(coords))
+                }
+            })
+
+            t_dots.attr("class", "realdots selected")
+
+            let temp = t_dots.data().map(d => d["id"])
+
+
+            // merge_union()
+
+            // update_views(selInsts)
+            s_dots.attr("class", "simdots")
+            t_dots = s_dots.filter((d, i) => {
+                // console.log("alala");
+                if (polygon.length > 2) {
+                    let elem = megaData[selMod]["sim_dots"][i]
+                    let coords = [xScale(elem["proj"][0]), yScale(elem["proj"][1])]
+
+                    // console.log(coords);
+
+                    return (d3.polygonContains(polygon, coords) && selected.push(coords))
+                }
+            })
+
+            t_dots.attr("class", "simdots selected")
+
+            temp = mergeDedupe([temp, t_dots.data().map(d => d["id"])])
+
+            merger(temp)
+
+
+            // r_dots.classed(
+            //     "selected",
+            //     polygon.length > 2
+            //         ? d => {
+            //             console.log(d3.polygonContains(polygon, [xScale2(d["proj"][0]), yScale2(d["proj"][1])]));
+            //             return  d3.polygonContains(polygon, [xScale2(d["proj"][0]), yScale2(d["proj"][1])]) && selected.push([xScale2(d["proj"][0]), yScale2(d["proj"][1])])
+            //
+            //         }
+            //         : false
+            // );
+
+            // console.log(selected);
+
+            svg.value = {polygon, selected};
+            svg.dispatchEvent(new CustomEvent('input'));
+        }
+
+
+        function draw(polygon) {
+            let r_dots = d3.selectAll("#overview .realdots")
+            let s_dots = d3.selectAll("#overview .simdots")
+            let space = 20;
+            let width = parseInt(d3.select("#overview").style("width").replace("px", ""))
+
+            let proj_realx = megaData[selMod]["real_dots"].map(d => d["proj"][0])
+            let proj_realy = megaData[selMod]["real_dots"].map(d => d["proj"][1])
+            let xScale2 = d3.scaleLinear(d3.extent(proj_realx), [width / 2 + space, width]).clamp(true).nice();
+            // let xScale2 = d3.scaleLinear([1, 0.2], [width / 2 + space, width]).clamp(true).nice();
+            let yScale2 = d3.scaleLinear(d3.extent(proj_realy), [230, 390]).clamp(true).nice();
+
+            let proj_simx = megaData[selMod]["sim_dots"].map(d => d["proj"][0])
+            let proj_simy = megaData[selMod]["sim_dots"].map(d => d["proj"][1])
+
+            let xScale = d3.scaleLinear(d3.extent(proj_simx), [0, width / 2 - space]).clamp(true).nice();
+            let yScale = d3.scaleLinear(d3.extent(proj_simy), [230, 390]).clamp(true).nice();
+
+
+            let svg = d3.select("#overview").node()
+
+            d3.selectAll("#overview .lasso").datum({
+                type: "LineString",
+                coordinates: polygon
+            }).attr("d", path);
+
+
+            // console.log();
+
+            const selected = polygon.length > 2 ? [] : megaData[selMod]["real_dots"].map(d => [xScale2(d["proj"][0]), yScale2(d["proj"][1])]);
+
+            // note: d3.polygonContains uses the even-odd rule
+            // which is reflected in the CSS for the lasso shape
+            // console.log(r_dots);
+
+            r_dots.attr("class", "realdots")
+
+            let t_dots = r_dots.filter((d, i) => {
+                // console.log("alala");
+                if (polygon.length > 2) {
+                    let elem = megaData[selMod]["real_dots"][i]
+                    let coords = [xScale2(elem["proj"][0]), yScale2(elem["proj"][1])]
+
+                    // console.log(coords);
+
+
+                    return (d3.polygonContains(polygon, coords) && selected.push(coords))
+                }
+            })
+
+            t_dots.attr("class", "realdots selected")
+
+            // merge_union(t_dots.data().map(d => d["id"]))
+
+            // update_views(selInsts)
+            s_dots.attr("class", "simdots")
+            t_dots = s_dots.filter((d, i) => {
+                // console.log("alala");
+                if (polygon.length > 2) {
+                    let elem = megaData[selMod]["sim_dots"][i]
+                    let coords = [xScale(elem["proj"][0]), yScale(elem["proj"][1])]
+
+                    // console.log(coords);
+
+                    return (d3.polygonContains(polygon, coords) && selected.push(coords))
+                }
+            })
+
+            t_dots.attr("class", "simdots selected")
+
+
+            // merge_union(t_dots.data().map(d => d["id"]))
+
+            // update_views(selInsts)
+
+
+            // r_dots.classed(
+            //     "selected",
+            //     polygon.length > 2
+            //         ? d => {
+            //             console.log(d3.polygonContains(polygon, [xScale2(d["proj"][0]), yScale2(d["proj"][1])]));
+            //             return  d3.polygonContains(polygon, [xScale2(d["proj"][0]), yScale2(d["proj"][1])]) && selected.push([xScale2(d["proj"][0]), yScale2(d["proj"][1])])
+            //
+            //         }
+            //         : false
+            // );
+
+            // console.log(selected);
+
+            svg.value = {polygon, selected};
+            svg.dispatchEvent(new CustomEvent('input'));
+        }
+
+        d3.select("#overview").append("path").attr("class", "lasso");
+
+        d3.select("#overview").append("defs").append("style").text(`
+      .selected {r: 6; stroke: #444444}
+      .lasso { fill-rule: evenodd; fill-opacity: 0.1; stroke-width: 1.5; stroke: #000; }
+    `);
+
+        d3.select("#overview").call(lasso().on("start lasso", draw).on("end", Enddraw));
+
+
+        $("#clipbtn").on("click", function () {
+            clip_bool = !clip_bool
+
+            $(this).toggleClass("button-primary")
+
+            if (!clip_bool) {
+                clipper.style("display", "none")
+            } else {
+                clipper.style("display", "")
+            }
+        })
+
+
+        $("#adj_btn_real").on("click", function () {
+            adj_bool_real = !adj_bool_real
+
+            if (adj_bool_real) {
+                $("#adj_img_real").css("display", "inline-block")
+                $("#adj_img_sim").css("display", "none")
+                adj_bool_sim = false;
+            } else {
+                $("#adj_img_real").css("display", "none")
+            }
+        });
+
+
+        $("#adj_btn_sim").on("click", function () {
+            adj_bool_sim = !adj_bool_sim
+
+            if (adj_bool_sim) {
+                $("#adj_img_sim").css("display", "inline-block")
+                $("#adj_img_real").css("display", "none")
+                adj_bool_real = false;
+            } else {
+                $("#adj_img_sim").css("display", "none")
+            }
+        });
+
+
+        $("#resQ").on("click", function () {
+            selInsts = [];
+            selsteps = [];
+
+            // draw_dots(d3.select("#overview"), megaData, selMod)
+
+            resetSel()
+
+            // d3.selectAll(".rect-tbrm").remove();
+            d3.selectAll(".rect-tbrm").remove();
+
+            $("#nbInst").html(selInsts.length + "/" + megaData[selMod]["real_dots"].length)
+
+        });
+
+
+        document.querySelectorAll(".__range-step").forEach(function (ctrl) {
+            var el = ctrl.querySelector('input');
+            var output = ctrl.querySelector('output');
+            var newPoint, newPlace, offset;
+            el.oninput = function () {
+                // colorize step options
+                ctrl.querySelectorAll("option").forEach(function (opt) {
+                    if (opt.value <= el.valueAsNumber)
+                        opt.style.backgroundColor = '#1EAEDB';
+                    else
+                        opt.style.backgroundColor = '#aaa';
+                });
+                // colorize before and after
+                var valPercent = (el.valueAsNumber - parseInt(el.min)) / (parseInt(el.max) - parseInt(el.min));
+                var style = 'background-image: -webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' +
+                    valPercent + ', #1EAEDB), color-stop(' +
+                    valPercent + ', #aaa));';
+                el.style = style;
+
+                // Popup
+                if ((' ' + ctrl.className + ' ').indexOf(' ' + '__range-step-popup' + ' ') > -1) {
+                    var selectedOpt = ctrl.querySelector('option[value="' + el.value + '"]');
+                    output.innerText = selectedOpt.text;
+                    output.style.left = "50%";
+                    output.style.left = ((selectedOpt.offsetLeft + selectedOpt.offsetWidth / 2) - output.offsetWidth / 2) + 'px';
+                }
+            };
+            el.oninput();
+        });
+
+        window.onresize = function () {
+            document.querySelectorAll(".__range").forEach(function (ctrl) {
+                var el = ctrl.querySelector('input');
+                el.oninput();
+            });
+        };
+
+
+        /*
+            $("#clip_radius").on("input", function () {
+
+                clip_rad = $(this).val()
+                clipper.selectAll("circle").transition().duration(65).attr("r", clip_rad)
+
+            })
+
+
+            $("#bg_opa").on("input", function () {
+
+                bg_opa = $(this).val()
+                img2.style("opacity", bg_opa)
+
+            })
+
+        */
+
+        // console.log(f);
+
+
+        function doStuff() {
+
+
+            for (let i = 0; i < megaData[selMod]["sim_dots"].length; i++) {
+
+
+                let elem = megaData[selMod]["sim_dots"][i];
+                let img = "x" + elem["gt_x"] + "_y0.047" + "_z" + elem["gt_y"] + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg"
+
+
+                img = "data_source/out/sim/expe_man_ctrl/" + img
+                // coords = [20, 20];
+
+                console.log(img);
+
+
+                let form = new FormData();
+                form.append("img", img);
+
+
+                $.ajax({
+                    type: "POST",
+                    url: "/single_pix",
+                    processData: false,
+                    contentType: false,
+                    data: form,
+                    success: function (d) {
+
+                        console.log(d);
+
+
+                        let can2 = document.getElementById('clip');
+                        let img = document.getElementById('sim_rgb');
+
+                        let ctx2 = can2.getContext('2d');
+
+                        // ctx2.save();
+                        // ctx2.translate(mapSaleX(elem["gt_x"]) +128, mapScaleY(elem["gt_y"]) + 128)
+                        // ctx2.rotate((180+elem["gt_r"]) * (Math.PI / 180))
+                        // ctx2.drawImage(img, -128,-128)
+                        //
+                        // ctx2.restore()
+
+                        let size = 8
+
+                        for (let i = 0; i < d.length; i++) {
+                            for (let j = 0; j < d[i].length; j++) {
+
+                                ctx2.save();
+                                ctx2.translate(mapSaleX(d[i][j][0]) + (size / 2), mapScaleY(d[i][j][1]) + (size / 2))
+                                ctx2.rotate((180 + elem["gt_r"]) * (Math.PI / 180))
+                                // ctx2.drawImage(img, i, j, i + 1, j + 1, mapSaleX(d[i][j][0]), mapScaleY(d[i][j][1]), 5, 5)
+                                ctx2.drawImage(img, i, j, i + 1, j + 1, -(size / 2), -(size / 2), size, size)
+                                ctx2.restore()
+                            }
+
+                        }
+
+                    }
+                })
+
+            }
+
+
+        }
+
+        let selectedCR;
+
+
+        let svg = d3.select("#main");
+
+        let clipper = svg.append("clipPath").attr("id", "clipper")
+
+        let clip_rad = 31;
+
+        const img = svg.append('image')
+            .attr('xlink:href', "/static/assets/images/map.jpg")
+            .style('height', '100%')
+            .style("opacity", 0.95)
+            .attr("clip-path", "url(#clipper)");
+
+        const img2 = svg.append('image')
+            .attr('xlink:href', "/static/assets/images/map.jpg")
+            .style('height', '100%')
+            .style("opacity", bg_opa)
+
+
+        // const img3 = svg.append('rect')
+        //     .attr('x', 0)
+        //     .attr('y', 0)
+        //     .attr('height', '3000')
+        //     .attr('width', '3000')
+        //     .style("fill", "#555555")
+        //     .style("opacity", 0.1)
+        //
+        //
+        // img3.moveToBack();
+        img2.moveToBack();
+        img.moveToBack();
+
+
+        // d3.brush
+
+
+        // d3.select("#main")
+        //     .append("circle")
+        //     .attr("id", "prev_depth")
+        //     .attr("cx", 10)
+        //     .attr("cy", 10)
+        //     .attr("r", 8)
+        //     .attr("fill", "red")
+        //     .style("opacity", 0)
+
+
+        let simMapScale = d3.scaleLinear().domain([0, 255]).range([0.155, 10.0])
+
+
+        $('#overview').on("click", ".realdots", function () {
+            let elem = d3.select(this)
+            let id = elem.attr("num")
+            selectedCR = id
+
+            $("#activ_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#activ_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#activ_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#activ_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+
+            $("#occlu_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#occlu_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#occlu_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#occlu_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+
+            $("#feat_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#feat_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#feat_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#feat_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+            if (disp_heat) {
+
+                const im = new Image();
+
+                im.src = "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"];
+                let form = new FormData();
+                let elem = megaData[selMod]["sim_dots"][id];
+
+                let file = "x" + format(elem["gt_x"]) + "_y0.047" + "_z" + format(elem["gt_y"]) + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg"
+                let path = "data_source/traj_cap/traj" + (parseInt(traj_mod) + 1) + "/sim/" + file
+
+                form.append("img", path);
+                form.append("occlu", occlu_bool);
+                form.append("cam", cam_bool);
+                form.append("feat", feat_bool);
+                form.append("model", parseInt(selMod) + 1)
+
+                $.ajax({
+                    type: "POST",
+                    url: "/mapping2",
+                    processData: false,
+                    contentType: false,
+                    data: form,
+                    success: function (d) {
+
+                        drawFakeHeat(d["map"])
+
+                        // if (cam_bool)
+                        drawCam(d)
+
+                        // if (occlu_bool) {
+                        //     drawOcclu(d["real_occlu"])
+                        // }
+                    }
+                })
+            }
+        })
+
+
+        $('#overview').on("click", ".simdots", function () {
+            let elem = d3.select(this)
+            let id = elem.attr("num")
+            selectedCR = id
+
+            $("#activ_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#activ_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#activ_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#activ_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+
+            $("#occlu_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#occlu_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#occlu_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#occlu_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+
+            $("#feat_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#feat_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#feat_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#feat_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+            if (disp_heat) {
+
+                const im = new Image();
+
+                im.src = "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"];
+                let form = new FormData();
+                let elem = megaData[selMod]["sim_dots"][id];
+
+                // let path = "data_source/out/sim/expe_man_ctrl/" + "x" + format(elem["gt_x"]) + "_y0.047" + "_z" + format(elem["gt_y"]) + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg"
+
+                let file = "x" + format(elem["gt_x"]) + "_y0.047" + "_z" + format(elem["gt_y"]) + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg"
+                let path = "data_source/traj_cap/traj" + (parseInt(traj_mod) + 1) + "/sim/" + file
+
+                form.append("img", path);
+                form.append("occlu", occlu_bool);
+                form.append("cam", cam_bool);
+                form.append("feat", feat_bool);
+                form.append("model", parseInt(selMod) + 1)
+
+
+                $.ajax({
+                    type: "POST",
+                    url: "/mapping2",
+                    processData: false,
+                    contentType: false,
+                    data: form,
+                    success: function (d) {
+
+                        drawFakeHeat(d["map"])
+
+                        // if (cam_bool)
+                        drawCam(d)
+
+                        // if (occlu_bool) {
+                        //     drawOcclu(d["real_occlu"])
+                        // }
+                    }
+                })
+            }
+        })
+
+
+        $("#main").on("mouseover", ".glyph", function () {
+
+            let elem = d3.select(this)
+
+            let id = elem.attr("num")
+            selectedCR = id
+
+
+            $("#activ_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#activ_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#activ_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#activ_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+
+            $("#occlu_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#occlu_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#occlu_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#occlu_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+
+            $("#feat_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["rgb"])
+            $("#feat_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][id]["depth"])
+
+            $("#feat_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"])
+            $("#feat_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["depth"])
+
+
+            if (disp_heat) {
+
+                const im = new Image();
+
+                im.src = "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][id]["rgb"];
+                let form = new FormData();
+                let elem = megaData[selMod]["sim_dots"][id];
+
+                let file = "x" + format(elem["gt_x"]) + "_y0.047" + "_z" + format(elem["gt_y"]) + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg"
+                let path = "data_source/traj_cap/traj" + (parseInt(traj_mod) + 1) + "/sim/" + file
+
+                form.append("img", path);
+                form.append("occlu", occlu_bool);
+                form.append("cam", cam_bool);
+                form.append("feat", feat_bool);
+                form.append("model", parseInt(selMod) + 1)
+
+                $.ajax({
+                    type: "POST",
+                    url: "/mapping2",
+                    processData: false,
+                    contentType: false,
+                    data: form,
+                    success: function (d) {
+
+                        drawFakeHeat(d["map"])
+
+                        // if (cam_bool)
+                        drawCam(d)
+
+                        // if (occlu_bool) {
+                        //     drawOcclu(d["real_occlu"])
+                        // }
+                    }
+                })
+            }
+        })
+
+
+        $("#main").on("mouseover", ".mapDot", function () {
+
+            // $("#activ_real_imgs").css("display", "inline-block");
+            // $("#activ_sim_imgs").css("display", "inline-block");
+
+            // $(".seled").toggleClass("seled").attr()
+
+            if ($(this).attr("class").includes("seled")) {
+
+            } else {
+
+
+                let color = "lightseagreen";
+                let from = $(this).attr("from");
+                let to = $(this).attr("to");
+                let tscale = d3.scaleLinear().domain([0, 15]).range(['#75a945', 'red']);
+                if (to === "gt") {
+                    if (from === "sim") {
+                        color = "indigo"
+                    } else if (from === "real") {
+                        color = "darkred"
+                    }
+                } else if (to === "real_dots") {
+                    // real_cam
+                    color = "salmon"
+                } else {
+                    color = "rgb(162,138,210)"
+                }
+                let svg = d3.select("#overview")
+                let width = parseInt(svg.style("width").replace("px", ""))
+                let y = 30
+                let rectSize = 14
+
+                let space = 20
+                let vspace = 20
+
+                let xScale = d3.scaleLinear([0.2, 1], [0, width / 2 - space]).clamp(true).nice();
+                let xScale2 = d3.scaleLinear([1, 0.2], [width / 2 + space, width]).clamp(true).nice();
+                let temp = []
+                let temp2 = []
+                let cr_nb = $(this).attr("num")
+
+                for (let j = 0; j < megaData.length; j++) {
+
+                    temp.push([xScale(megaData[j]["sim_dots"][cr_nb]["perf"]), (vspace + (y * j) + rectSize)])
+                    temp2.push([xScale2(megaData[j]["real_dots"][cr_nb]["perf"]), (vspace + (y * j) + rectSize)])
+                }
+
+                let simDif = temp.map(d => d[0]);
+                let realDif = temp2.map(d => d[0]);
+
+                // simDif.reduce((a, b) => Math.abs(a + b))
+
+                let sim_sum = 0;
+                let real_sum = 0;
+
+
+                for (let i = 0; i < simDif.length - 1; i++) {
+                    sim_sum += Math.abs(simDif[i] - simDif[i + 1])
+                }
+
+                for (let i = 0; i < realDif.length - 1; i++) {
+                    real_sum += Math.abs(realDif[i] - realDif[i + 1])
+                }
+
+                real_sum = real_sum / realDif.length;
+                sim_sum = sim_sum / simDif.length
+
+                // console.log(real_sum + " Real");
+                // console.log(sim_sum + " Sim");
+
+                svg.selectAll(".tbrm").remove();
+
+                svg.append("path")
+                    .attr("class", "tbrm")
+                    .attr("d", d3.line()(temp))
+                    .attr("stroke", "rgb(26,83,10)")
+                    .style("stroke-width", "2px")
+                    .style("opacity", 0.8)
+                    .attr("fill", "none")
+
+                svg.append("path")
+                    .attr("class", "tbrm")
+                    .attr("d", d3.line()(temp2))
+                    .attr("stroke", "rgb(26,83,10)")
+                    .style("stroke-width", "2px")
+                    .style("opacity", 0.95)
+                    .attr("fill", "none")
+
+
+                // let treal = megaData[selMod]["real_dots"][telem["id"]]
+                // let tsim = megaData[selMod]["sim_dots"][telem["id"]]
+                // let tdist = euclidian_dist([treal["x"], treal["y"]], [tsim["x"], tsim["y"]]);
+
+                // let cr_nb = $(this).attr("num");
+                // console.log("ha");
+                d3.selectAll(".seled").each(function (d) {
+
+                    let elem = d3.select(this);
+                    // console.log(elem);
+                    let id = elem.attr("num")
+
+                    // let treal = megaData[selMod]["real_dots"][id];
+                    // let tsim = megaData[selMod]["sim_dots"][id];
+                    // let tdist = euclidian_dist([treal["x"], treal["y"]], [tsim["x"], tsim["y"]]);
+
+                    let t_mod = elem.attr("transform")
+
+                    // t_mod = t_mod.replace(" scale(" + scaleMark + ")","")
+
+                    // elem.transition().duration(30).attr("transform", t_mod)
+                });
+
+
+                $(".seled").toggleClass("seled")
+                $(this).toggleClass("seled")
+
+                // let t_m = d3.selectAll(".seled").attr("transform").replace(" scale(" + scaleMark + ")","") + " scale(" + scaleMark + ")"
+
+                // d3.selectAll(".seled").transition().duration(30).attr("fill", "green").attr("transform", t_m)
+
+                selectedCR = cr_nb
+
+
+                $("#activ_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][cr_nb]["rgb"])
+                $("#activ_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][cr_nb]["depth"])
+
+                $("#activ_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][cr_nb]["rgb"])
+                $("#activ_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][cr_nb]["depth"])
+
+                $("#occlu_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][cr_nb]["rgb"])
+                $("#occlu_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][cr_nb]["depth"])
+
+                $("#occlu_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][cr_nb]["rgb"])
+                $("#occlu_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][cr_nb]["depth"])
+
+                $("#feat_real_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][cr_nb]["rgb"])
+                $("#feat_real_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["real_dots"][cr_nb]["depth"])
+
+                $("#feat_sim_rgb").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][cr_nb]["rgb"])
+                $("#feat_sim_depth").attr("src", "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][cr_nb]["depth"])
+
+
+                if (disp_heat) {
+
+                    const im = new Image();
+
+                    im.src = "data:image/jpeg;base64," + megaData[selMod]["sim_dots"][cr_nb]["rgb"];
+                    let form = new FormData();
+                    let elem = megaData[selMod]["sim_dots"][cr_nb];
+
+
+                    let file = "x" + format(elem["gt_x"]) + "_y0.047" + "_z" + format(elem["gt_y"]) + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg"
+                    let path = "data_source/traj_cap/traj" + (parseInt(traj_mod) + 1) + "/sim/" + file
+
+
+                    form.append("img", path);
+                    form.append("occlu", occlu_bool);
+                    form.append("cam", cam_bool);
+                    form.append("feat", feat_bool);
+                    form.append("model", parseInt(selMod) + 1)
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/mapping2",
+                        processData: false,
+                        contentType: false,
+                        data: form,
+                        success: function (d) {
+                            console.log(d);
+
+                            drawFakeHeat(d["map"])
+
+                            // if (cam_bool)
+                            drawCam(d)
+
+                            // if (occlu_bool) {
+                            //     drawOcclu(d["real_occlu"])
+                            // }
+                        }
+                    })
+                }
+            }
+        })
+
+        function format(name) {
+            name = "" + name
+            let temp = name.split(".")
+
+
+            if (temp[1].length < 3) {
+                temp[1] = temp[1] + "0"
+            }
+
+            return temp[0] + "." + temp[1]
+        }
+
+        // svg = d3.select("#estim")
+        // svg2 = d3.select("#estim2")
+        // let drag = d3.drag().on("drag", dragged);
+        //
+        //
+        // svg.call(drag)
+        // svg2.call(drag)
+        //
+        // let cr = svg.append("circle")
+        //     .attr("cx", 10)
+        //     .attr("cy", 10)
+        //     .attr("r", 6)
+        //     .attr("stroke", "black")
+        //     .attr("fill", "red");
+        //
+        //
+        // let cr2 = svg2.append("circle")
+        //     .attr("cx", 10)
+        //     .attr("cy", 10)
+        //     .attr("r", 6)
+        //     .attr("stroke", "black")
+        //     .attr("fill", "red");
+        //
+        //
+        // function dragstarted() {
+        //     d3.event.subject.active = true;
+        // }
+        //
+        // function dragged(event) {
+        //     let [clientX, clientY] = [event.x, event.y];
+        //
+        //     clientY = clientY > 175 ? clientY - 181 : clientY;
+        //
+        //
+        //     cr.transition().duration(30).attr("cx", clientX).attr("cy", clientY);
+        //     cr2.transition().duration(30).attr("cx", clientX).attr("cy", clientY);
+        //
+        //     clientX = (clientX < 230 ? clientX + 20 : clientX); // TODO: THIS HERE IS DONE TO PREVENT DEPTH vs RGB align
+        //     //
+        //     let elem = megaData[selMod]["sim_dots"][selectedCR];
+        //
+        //
+        //     get_coords([clientX, clientY], "x" + elem["gt_x"] + "_y0.047" + "_z" + elem["gt_y"] + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg")
+        //
+        // }
+
+
+        $("#overview").on("click", ".modRect", function () {
+            selMod = $(this).attr("num");
+
+            d3.selectAll('.selRect').attr("class", "modRect")
+            d3.selectAll('.modRect[num="' + selMod + '"]').attr("class", "modRect selRect")
+            draw_dots(d3.select("#overview"), megaData, selMod)
+            // update_views(selInsts)
+            $("#resQ").click()
+        })
+
+
+        $("#overview").on("click", ".modRectAdded", function () {
+
+            let temp = added.filter(d => d ["traj"] === traj_mod);
+            selMod = $(this).attr("num");
+
+            temp[selMod] = temp[selMod]["data"]
+
+            draw_dots(d3.select("#overview"), temp, selMod)
+            update_views(selInsts)
+        })
+
+        $(".dat_box").on("change", function () {
+
+            const elem = $(this);
+
+            dat_vals[parseInt(elem.attr("num"))] = elem.is(":checked");
+
+
+            let reals = d3.selectAll(".selReal").data()
+            let sims = d3.selectAll(".selSim").data()
+
+            if (reals.length === 0 && sims.length === 0) {
+                fillMap(d3.select("#main"), megaData[selMod]["real_dots"])
+            }
+
+
+        })
+
+
+        $("#heatBool").on("change", function () {
+
+            disp_heat = !disp_heat
+
+
+            if (disp_heat) {
+                $("#activ_sim_sal").css("opacity", "0.3")
+                $("#activ_real_sal").css("opacity", "0.3")
+
+                $("#activ_sim_depth_sal").css("opacity", "0.3")
+                $("#activ_real_depth_sal").css("opacity", "0.3")
+
+
+                $("#occlu_sim_sal").css("opacity", "0.3")
+                $("#occlu_real_sal").css("opacity", "0.3")
+
+                $("#occlu_sim_depth_sal").css("opacity", "0.3")
+                $("#occlu_real_depth_sal").css("opacity", "0.3")
+
+
+                $("#feat_sim_sal").css("opacity", "0.3")
+                $("#feat_real_sal").css("opacity", "0.3")
+
+                $("#feat_sim_depth_sal").css("opacity", "0.3")
+                $("#feat_real_depth_sal").css("opacity", "0.3")
+
+
+            } else {
+                $("#activ_sim_sal").css("opacity", "0")
+                $("#activ_real_sal").css("opacity", "0")
+
+                $("#activ_sim_depth_sal").css("opacity", "0")
+                $("#activ_real_depth_sal").css("opacity", "0")
+
+
+                $("#occlu_sim_sal").css("opacity", "0")
+                $("#occlu_real_sal").css("opacity", "0")
+
+                $("#occlu_sim_depth_sal").css("opacity", "0")
+                $("#occlu_real_depth_sal").css("opacity", "0")
+
+
+                $("#feat_sim_sal").css("opacity", "0")
+                $("#feat_real_sal").css("opacity", "0")
+
+                $("#feat_sim_depth_sal").css("opacity", "0")
+                $("#feat_real_depth_sal").css("opacity", "0")
+            }
+
+        })
+
+
+        $("#heater").on("input", function () {
+
+            let val = $(this).val()
+
+            cam_bool = false;
+            occlu_bool = false;
+            feat_bool = false;
+
+            if (val == "cam") {
+                cam_bool = true
+
+            } else if (val == "occlu") {
+                occlu_bool = true
+
+            } else if (val == "feat") {
+                feat_bool = true
+            }
+        })
+
+
+        $("#heatbtn").on("click", function () {
+            global_heat()
+        })
+
+        // $("#occlusion").on("click", function () {
+        //
+        //     if (occlu_bool) {
+        //         $(this).val(0)
+        //         occlu_bool = false
+        //         $("#real_occlu").css("opacity", "0")
+        //         $("#real_occlu_depth").css("opacity", "0")
+        //     } else {
+        //         $(this).val(1)
+        //         occlu_bool = true
+        //         $("#real_occlu").css("opacity", "0.3")
+        //         $("#real_occlu_depth").css("opacity", "0.2")
+        //     }
+        // })
+
+
+        // $("#r_bright").on("input", function () {
+        //
+        //     let elem = $(this)
+        //     let val = elem.val();
+        //     elem.css("filter", "brightness(" + Math.min(1.5, val) + ")")
+        //
+        //
+        //     $("#real_rgb").css("filter", "brightness(" + val + ")"
+        //     )
+        // })
+
+
+        // $("#r_contrast").on("input", function () {
+        //
+        //     let elem = $(this)
+        //     let val = elem.val();
+        //     elem.css("filter", "contrast(" + Math.min(1.5, val) + ")")
+        //
+        //
+        //     $("#real_rgb").css("filter", "contrast(" + val + ")"
+        //     )
+        // })
+        //
+        //
+
+
+        $("#r_drange").on("input", function () {
+
+            let elem = $(this)
+            let val = elem.val();
+            elem.css("filter", "contrast(" + Math.min(1.5, val) + ")")
+
+
+            $(".realImDepth").css("filter", "brightness(" + val + ")"
+            )
+
+
+            elem = megaData[selMod]["sim_dots"][selectedCR];
+            let img = "x" + elem["gt_x"] + "_y0.047" + "_z" + elem["gt_y"] + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg"
+
+
+            updatePred(img)
+        })
+
+
+        function makeFilter() {
+
+            let bright = $("#r_bright").val()
+            let contrast = $("#r_contrast").val()
+
+            $(".realIm").css("filter", "brightness(" + bright + ") contrast(" + contrast + ") " + makeWhite())
+
+            let elem = megaData[selMod]["sim_dots"][selectedCR];
+            let img = "x" + format(elem["gt_x"]) + "_y0.047" + "_z" + format(elem["gt_y"]) + "_r" + ((elem["gt_r"] > 180 ? elem["gt_r"] - 360 : elem["gt_r"])) + "_rgb.jpeg"
+
+
+            // img = "data_source/out/sim/expe_man_ctrl/" + img
+            updatePred(img)
+
+        }
+
+
+        function makeDepthFilter() {
+
+            let bright = $("#r_drange").val()
+            let blur = $("#r_dblur").val() * 2
+
+
+            $(".realImDepth").css("filter", "brightness(" + bright + ") blur(" + blur + "px) ")
+
+        }
+
+
+        $(".real_rgb_slide").on("change", function () {
+
+            makeFilter()
+        })
+
+
+        $(".real_depth_slide").on("input", function () {
+
+            makeDepthFilter()
+        })
+
+
+        $(".sim_rgb_slide").on("change", function () {
+
+            change_sim()
+        })
+
+
+        function makeWhite() {
+
+            let temp = $("#r_white").val()
+            let mes = ""
+            if (temp > 0) {
+                mes += "sepia(" + temp + ")"
+            }
+
+            return mes
+
+        }
+
+
+        function updatePred(img) {
+            let temp = $("#r_white").val();
+            let bright = $("#r_bright").val();
+            let contrast = $("#r_contrast").val();
+
+
+            let depth_bright = $("#r_drange").val();
+            let depth_blur = $("#r_dblur").val() * 2;
+
+
+            let res = {
+                "rgb": {
+                    "bright": bright,
+                    "contrast": contrast,
+                    "sepia": temp
+                },
+                "depth": {
+                    "bright": depth_bright,
+                    "blur": depth_blur
+                }
+            };
+
+            let form = new FormData();
+            form.append("img", img);
+            form.append("mods", JSON.stringify(res));
+            form.append("model", parseInt(selMod) + 1)
+            form.append("traj", parseInt(traj_mod) + 1)
+
+            $.ajax({
+                type: "POST",
+                url: "/runmod",
+                processData: false,
+                contentType: false,
+                data: form,
+                success: function (d) {
+
+
+                    drawCam(d)
+                    let svg = d3.select("#main")
+
+                    svg.selectAll(".prevTBRM").remove();
+
+
+                    let tr = d["r"]
+                    let tx = mapSaleX(d["x"])
+                    let ty = mapScaleY(d["y"])
+
+                    svg.append("path")
+                        .attr("class", "prevTBRM")
+                        .attr("stroke", "#555555")
+                        .attr("fill", "purple")
+                        .style("stroke-width", "1px")
+                        .attr("d", "m 20 20 a -6 6 7 0 1 14 0 l -7 23 l -7 -23")
+                        .attr("transform", "rotate(" + (180 - tr) + "  " + (tx - 2) + " " + (ty - 2) + ")  translate(" + (tx - 17) + " " + (ty - 17) + " )  scale(0.6)")
+
+
+                }
+
+            })
+        }
+
+
+        $("#real_str").on("click", function () {
+
+            let lines = d3.selectAll(".real_paraline")
+
+            let domain = lines.data().map(d => d["diff"]);
+            let scale = d3.scaleLinear(d3.extent(domain), [0, 1])
+
+
+            real_straight = !real_straight;
+            let temp = [];
+
+            if (real_straight || real_curve) {
+                lines.style("opacity", 0.02);
+                lines.filter(d => {
+                    if (real_straight && (1 - scale(d["diff"]) > 0.85)) {
+                        temp.push(d["id"]);
+                        return true
+                    } else return false
+
+                }).style("opacity", "0.9")
+
+            } else {
+                lines.style("opacity", 0.9);
+            }
+
+            merger(temp)
+
+            // merge_union(temp);
+
+            // update_views(selInsts)
+        })
+
+
+        $("#real_curv").on("click", function () {
+
+            let lines = d3.selectAll(".real_paraline")
+
+            let domain = lines.data().map(d => d["diff"]);
+            let scale = d3.scaleLinear(d3.extent(domain), [0, 1])
+
+
+            real_curve = !real_curve;
+            let temp = [];
+
+            if (real_straight || real_curve) {
+                lines.style("opacity", 0.02);
+                lines.filter(d => {
+                    if (real_curve && (1 - scale(d["diff"]) < 0.15)) {
+                        temp.push(d["id"]);
+                        return true
+                    } else return false
+
+                }).style("opacity", "0.9")
+
+            } else {
+                lines.style("opacity", 0.9);
+            }
+
+            merger(temp)
+            // merge_union(temp);
+
+            // update_views(selInsts)
+        });
+
+
+        $("#sim_str").on("click", function () {
+
+            let lines = d3.selectAll(".sim_paraline");
+
+            let domain = lines.data().map(d => d["diff"]);
+            let scale = d3.scaleLinear(d3.extent(domain), [0, 1])
+
+// sim_curve && (1 - scale(d["diff"]) < 0.15);
+            sim_straight = !sim_straight;
+            let temp = [];
+
+            if (sim_straight || sim_curve) {
+
+                lines.style("opacity", 0.02);
+
+                lines.filter(d => {
+                    if (1 - scale(d["diff"]) > 0.85) {
+                        temp.push(d["id"]);
+                        return true
+                    }
+                    return false;
+
+                });
+                merger(temp)
+                // merge_union(temp);
+
+                // update_views(selInsts)
+
+                lines.filter(d => {
+                    return selInsts.includes(d["id"]);
+                }).style("opacity", 0.9);
+
+            } else {
+                lines.style("opacity", 0.9);
+            }
+
+        })
+
+
+        $("#sim_curv").on("click", function () {
+
+            let lines = d3.selectAll(".sim_paraline")
+
+            let domain = lines.data().map(d => d["diff"]);
+            let scale = d3.scaleLinear(d3.extent(domain), [0, 1])
+
+
+            sim_curve = !sim_curve;
+            let temp = [];
+            if (sim_straight || sim_curve) {
+                lines.style("opacity", 0.02);
+                lines.filter(d => {
+                    if (sim_curve && (1 - scale(d["diff"]) < 0.15)) {
+                        temp.push(d["id"]);
+                        return true
+                    } else return false
+
+                }).style("opacity", "0.9")
+
+            } else {
+                lines.style("opacity", 0.9);
+            }
+            merger(temp)
+
+            // merge_union(temp);
+
+            // update_views(selInsts)
+
+        })
+
+        //
+        // $("#real_diff").on("input", function () {
+        //
+        //
+        //     let lines = d3.selectAll(".real_paraline")
+        //
+        //     lines.style("opacity", 0.04)
+        //
+        //     let val = $(this).val()
+        //
+        //
+        //     let domain = lines.data().map(d => d["diff"]);
+        //
+        //     let scale = d3.scaleLinear(d3.extent(domain), [0, 1])
+        //
+        //
+        //     lines.filter(d => {
+        //         // console.log(scale(d["diff"]))
+        //         return 1 - scale(d["diff"]) < val
+        //     }).style("opacity", "0.9")
+        //
+        // })
+        //
+        //
+        // $("#sim_diff").on("input", function () {
+        //
+        //
+        //     let lines = d3.selectAll(".sim_paraline")
+        //
+        //     lines.style("opacity", 0.04)
+        //
+        //     let val = $(this).val()
+        //
+        //
+        //     let domain = lines.data().map(d => d["diff"]);
+        //
+        //     let scale = d3.scaleLinear(d3.extent(domain), [0, 1])
+        //
+        //
+        //     lines.filter(d => {
+        //         // console.log(scale(d["diff"]))
+        //         return scale(d["diff"]) < val
+        //     }).style("opacity", "0.9")
+        //
+        //
+        // })
+
+
+        $("#stats_bar").on("mouseover", "rect", function () {
+
+
+            let elem = d3.select(this)
+            let id = elem.attr("num");
+
+
+            d3.select("#stats_bar").selectAll("rect[num='" + id + "']").attr("class", "sel");
+
+            let rects = roomsBounds[id];
+
+            d3.select("#mapover").remove()
+
+            for (let i = 0; i < rects.length; i++) {
+
+                let rect = rects[i]
+                d3.select("#main").append("rect")
+                    .attr("id", "mapover")
+                    .attr("x", mapSaleX(rect[0][0]))
+                    .attr("y", mapScaleY(rect[0][1]))
+                    .attr("width", mapSaleX(rect[1][0]) - mapSaleX(rect[0][0]))
+                    .attr("height", mapScaleY(rect[1][1]) - mapScaleY(rect[0][1]))
+                    .attr("fill", "rgba(80,80,80,0.4)")
+                    .attr("stroke", "#555555")
+
+            }
+
+
+        })
+
+
+        $("#stats_bar").on("click", "rect", function () {
+
+
+            let elem = d3.select(this)
+            let id = elem.attr("num");
+            let fro = elem.attr("from");
+            console.log(fro);
+
+            merger(id_stock[fro][id])
+            // merge_union(id_stock[fro][id])
+
+            // update_views(selInsts)
+
+        })
+
+        $("#stats_bar").on("mouseout", "rect", function () {
+
+            // let rect = [[7.3, 2.6], [12.55, 15.9]]
+
+            d3.select("#mapover").remove()
+
+            let elem = d3.select(this)
+
+            let id = elem.attr("num");
+            d3.select("#stats_bar").selectAll("rect[num='" + id + "']").attr("class", "")
+        })
+
+
+        $("#kmod").on("input", function () {
+
+            kmods = $(this).val()
+
+
+            if (kmods == 0) {
+                dat_vals = [true, true, true]
+            } else {
+                dat_vals = [false, true, false]
+            }
+
+
+            draw_dots(d3.select("#overview"), megaData, selMod)
+
+            if (selInsts.length > 0)
+                update_views(selInsts)
+
+        })
+
+
+        function ramp(canvas, color, n = 550) {
+            let sc = d3.scaleLinear().domain([0, n]).range([0, 10])
+
+
+            const context = canvas.getContext("2d");
+            // canvas.style.margin = "0 -14px";
+            // canvas.style.width = "calc(100% + 28px)";
+            // canvas.style.height = "40px";
+            canvas.style.imageRendering = "-moz-crisp-edges";
+            canvas.style.imageRendering = "pixelated";
+            canvas.style.border = "solid #555555 1px";
+            let w = 300 / n
+            for (let i = 0; i < n; ++i) {
+                // console.log(i / (n - 1));
+
+                context.fillStyle = color(sc(i));
+                context.fillRect(i * w, 0, w, 150);
+            }
+
+            for (let i = 0; i < n; ++i) {
+                // console.log(i / (n - 1));
+
+                context.fillStyle = color(sc(i));
+                context.fillRect(i * w, 0, w, 150);
+            }
+
+
+        }
+
+        $("#stats_orr").on("click", "path", function () {
+
+            let elem = d3.select(this)
+            let id = elem.attr("num");
+            let fro = elem.attr("from");
+            console.log(fro);
+
+            merger(saved_pie[fro][id])
+
+            // merge_union()
+
+            // update_views(selInsts)
+
+
+        })
+
+        const keymap = {};
+        onkeyup = function (e) {
+            if (e.keyCode in keymap) {
+                keymap[e.keyCode] = false;
+            }
+            update_keys()
+        };
+
+        onkeydown = function (e) {
+            e = e || event;
+            keymap[e.keyCode] = e.type === 'keydown';
+            update_keys()
+
+            // if (keymap[9]) {
+            //     hideResbool = !hideResbool;
+            //
+            //     if (hideResbool) {
+            //         d3.selectAll(".res").transition().duration(250).style("opacity", 0)
+            //     } else {
+            //         d3.selectAll(".res").transition().duration(250).style("opacity", 1)
+            //     }
+            // }
+
+        };
+
+
+        function update_keys() {
+
+            $("#shift").attr("src", (keymap[16] ? "static/assets/images/shift_in.svg" : "static/assets/images/shift.svg"))
+            $("#ctrl").attr("src", (keymap[17] ? "static/assets/images/ctrl_in.svg" : "static/assets/images/ctrl.svg"))
+            $("#alt").attr("src", (keymap[18] ? "static/assets/images/alt_in.svg" : "static/assets/images/alt.svg"))
+
+            // $("#shift").css("background-color", (keymap[16] ? "black" : "white"))
+            // $("#shift").css("color", (keymap[16] ? "white" : "black"))
+
+            // $("#ctrl").css("background-color", (keymap[17] ? "black" : "white"))
+            // $("#ctrl").css("filter", (keymap[17] ? "invert(1)" : "invert(0)"))
+
+        }
+
+
+        $("#datasets").on("input", function () {
+            let elem = $(this).val()
+
+            traj_mod = elem
+
+            megaData = tot_dat[traj_mod]
+
+            d3.selectAll("#overview *").remove()
+            draw_models(d3.select("#overview"), megaData)
+            draw_dots(d3.select("#overview"), megaData, selMod)
+
+            d3.select("#overview").append("path").attr("class", "lasso");
+
+            d3.select("#overview").append("defs").append("style").text(`
+      .selected {r: 6; stroke: #444444}
+      .lasso { fill-rule: evenodd; fill-opacity: 0.1; stroke-width: 1.5; stroke: #000; }
+    `);
+
+            d3.select("#overview").call(lasso().on("start lasso", draw).on("end", Enddraw));
+
+
+            d3.selectAll('.modRect[num="' + selMod + '"]').attr("class", "modRect selRect")
+
+
+        })
+
+
+        $("#adjAll_real").on("click", function () {
+
+
+            let temp = $("#r_white").val();
+            let bright = $("#r_bright").val();
+            let contrast = $("#r_contrast").val();
+
+
+            let depth_bright = $("#r_drange").val();
+            let depth_blur = $("#r_dblur").val() * 2;
+
+
+            let res = {
+                "rgb": {
+                    "bright": bright,
+                    "contrast": contrast,
+                    "sepia": temp
+                },
+                "depth": {
+                    "bright": depth_bright,
+                    "blur": depth_blur
+                }
+            };
+
+
+            let form = new FormData();
+            form.append("img", img);
+            form.append("mods", JSON.stringify(res));
+            form.append("model", parseInt(selMod) + 1)
+            form.append("traj", parseInt(traj_mod) + 1)
+
+            console.log(img);
+
+            $.ajax({
+                type: "POST",
+                url: "/run_all",
+                processData: false,
+                contentType: false,
+                data: form,
+                success: function (d) {
+
+                    res["model"] = selMod
+                    res["traj"] = traj_mod
+                    res["data"] = d
+                    mod_names.push("added_" + added.length)
+                    megaData[og_nb + added.length] = d
+                    added.push(res)
+
+                    draw_models(d3.select("#overview"), megaData)
+
+
+                    console.log(d);
+
+                }
+
+            })
+
+
+        })
+
+
+        $("#s_min_par").on("click", function () {
+
+
+            let lines = d3.selectAll(".sim_paraline")
+
+            let perfs = megaData[selMod]["sim_dots"].map(d => [d["perf"], d["id"]])
+
+            perfs.sort((a, b) => a[0] - b[0])
+
+            perfs = perfs.slice(0, Math.round(perfs.length * alphaPara))
+
+
+            lines.style("opacity", 0.02);
+            lines.filter(d => {
+                return megaData[selMod]["sim_dots"][d["id"]]["perf"] < perfs[perfs.length - 1][0];
+            }).style("opacity", "0.9")
+
+            merger(perfs.map(d => d[1]))
+        })
+
+
+        $("#s_max_par").on("click", function () {
+
+
+            let lines = d3.selectAll(".sim_paraline")
+
+            let perfs = megaData[selMod]["sim_dots"].map(d => [d["perf"], d["id"]])
+
+            perfs.sort((a, b) => a[0] - b[0]);
+
+            perfs = perfs.slice(Math.round(perfs.length * (1 - alphaPara)));
+
+            lines.style("opacity", 0.02);
+            lines.filter(d => {
+                return megaData[selMod]["sim_dots"][d["id"]]["perf"] > perfs[0][0];
+            }).style("opacity", "0.9")
+
+            merger(perfs.map(d => d[1]))
+        })
+
+        $("#r_max_par").on("click", function () {
+
+
+            let lines = d3.selectAll(".real_paraline")
+
+            let perfs = megaData[selMod]["real_dots"].map(d => [d["perf"], d["id"]])
+
+            perfs.sort((a, b) => a[0] - b[0]);
+
+            perfs = perfs.slice(Math.round(perfs.length * (1 - alphaPara)))
+
+            lines.style("opacity", 0.02);
+            lines.filter(d => {
+                return megaData[selMod]["real_dots"][d["id"]]["perf"] > perfs[0][0];
+            }).style("opacity", "0.9")
+
+            merger(perfs.map(d => d[1]))
+        })
+
+
+        $("#r_min_par").on("click", function () {
+
+            let lines = d3.selectAll(".real_paraline")
+
+            let perfs = megaData[selMod]["real_dots"].map(d => [d["perf"], d["id"]])
+
+            perfs.sort((a, b) => a[0] - b[0])
+
+            perfs = perfs.slice(0, Math.round(perfs.length * alphaPara))
+
+
+            lines.style("opacity", 0.02);
+            lines.filter(d => {
+                return megaData[selMod]["real_dots"][d["id"]]["perf"] < perfs[perfs.length - 1][0];
+            }).style("opacity", "0.9")
+
+            merger(perfs.map(d => d[1]))
+        })
+
+
+    </script>
+
+</div>
+</body>
+</html>
