@@ -25,29 +25,19 @@ function merger(data) {
 
 function merge_union(data) {
 
-    // selsteps.push(data);
     selInsts = mergeDedupe([selInsts, data])
-    // selInsts = [...new Set(selInsts, data)] //.concat(data).filter(onlyUnique)
-    // console.log(selInsts);
-
     $("#nbInst").html(selInsts.length + "/" + megaData[selMod]["real_dots"].length)
 }
 
 function merge_inter(data) {
     selInsts = intersect(selInsts, data)
-    // selInsts = [...new Set(selInsts, data)] //.concat(data).filter(onlyUnique)
-    // console.log(selInsts);
-
     $("#nbInst").html(selInsts.length + "/" + megaData[selMod]["real_dots"].length)
 }
-
 
 function merge_clear(data) {
     selInsts = data
-
     $("#nbInst").html(selInsts.length + "/" + megaData[selMod]["real_dots"].length)
 }
-
 
 function intersect(a, b) {
     return a.filter(Set.prototype.has, new Set(b));

@@ -3,17 +3,8 @@ const thick = 7
 const rad = 6
 
 function get_orr(p1, p2) {
-    // return Math.atan2(p1[1] - p2[1]), (p1[0] - p2[0]) * (180 / Math.PI);
     let a = (Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180) / Math.PI;
-    // a -= 90;
-    // a = a < 0 ? Math.abs(a) : 360 - a;
-
     a += 90;
-    //   // a = a > 180 ? a - 180 : a + 180;
-
-    //   a = (a + 180) % 360;
-    //   a = a > 180 ? a - 180 : a + 180;
-
     return a;
 }
 
@@ -58,14 +49,11 @@ function drawInst(svg, data, id) {
     let g = svg.append("g").attr("class", "glyph").attr("num", id)
 
     let real_ang = get_orr(data[0], data[1]);
-
-
     const fix_gt = [mapSaleX.invert(data[0][0]), mapScaleY.invert(data[0][1])]
     const fix_real = [mapSaleX.invert(data[1][0]), mapScaleY.invert(data[1][1])]
 
     let real_dist = scaleDist(euclidian_dist(fix_gt, fix_real));
 
-    // console.log(euclidian_dist(mapSaleX.invert(data[0]), mapScaleY.invert(data[1])));
 
     let real_st_ang = real_ang - real_dist / 2;
     let real_en_ang = real_ang + real_dist / 2;
@@ -82,8 +70,6 @@ function drawInst(svg, data, id) {
     let sim_ang = get_orr(data[0], data[2]);
 
     const fix_sim = [mapSaleX.invert(data[2][0]), mapScaleY.invert(data[2][1])]
-
-
     let sim_dist = scaleDist(euclidian_dist(fix_gt, fix_sim));
 
     let sim_st_ang = sim_ang - sim_dist / 2;
@@ -148,21 +134,6 @@ function drawInst(svg, data, id) {
         .style("stroke-width", thick + "px")
         .style("opacity", 1);
 
-
-    // svg
-    //   .append('rect')
-    //   // .attr("class", "slice")
-    //   // .attr('d', describeArc(100, 60, 50, 0, 150))
-    //   .attr("x", 10)
-    //   .attr("y", 10)
-    //   .attr("width", 50)
-    //   .attr("height", 50)
-    //   .attr('fill', "None")
-    //   .attr("stroke", "red")
-    //   .style("stroke-width", "20px")
-    //   .style("opacity", 0.7);
-
-
     if (contains2(sim_st_ang, sim_en_ang, real_st_ang)) {
 
         if (contains2(sim_st_ang, sim_en_ang, real_en_ang)) {
@@ -213,11 +184,5 @@ function contains2(x0, x1, x) {
         x1 += 360;
         return x >= x0 && x < x1;
     }
-    // else if (x0 < 181 && x1 > 180) {
-    //   x += 360;
-    //   x0 += 360;
-    //   return x >= x0 && x < x1;
-    // }
-
     return x >= x0 && x < x1;
 }

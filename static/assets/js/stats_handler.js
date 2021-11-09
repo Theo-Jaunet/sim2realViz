@@ -43,24 +43,13 @@ function make_pie(svg, data, x, y, label) {
         return d
     });
 
-    // let n = 10
-    // let temp = {}
-    // let bob = d3.range(n)
-    // bob.map(d => {
-    //     temp[d] = 360 / n;
-    //     return d
-    // })
-
-
-    // console.log(temp);
-    // console.log(Object.entries(temp));
 
     const g = svg.append('g')
         .attr('transform', 'translate(' + x + ',' + y + ')');
 
     const pie = d3.pie()
         .value((d) => d[1]);
-    // console.log(pie(Object.entries(temp)));
+
 
     const part = g.selectAll('.part')
         .data(pie(Object.entries(temp)))
@@ -98,31 +87,7 @@ function make_pie(svg, data, x, y, label) {
         .style("text-anchor", "middle")
         .text(label)
 
-
-    // g.append("circle")
-    //     .attr("cx", 0)
-    //     .attr("cy", 0)
-    //     .attr("r", 15)
-    //     .attr("fill", "none")
-    //     .attr("stroke", "#555555")
-    //     .attr("stroke-width", "1px")
-
 }
-
-//
-// let arc = d3.arc()
-//      .innerRadius(0)
-//      .outerRadius(20)
-
-//     const part = g.selectAll('.part')
-//         .data(pie(Object.entries(temp)))
-//         .enter()
-//         .append('path')
-//         .attr('d',arc)
-//         .attr('fill', (d, i) => "steelblue")
-//
-//
-// }
 
 
 function makeRealOrr() {
@@ -163,14 +128,7 @@ function makeGtOrr() {
     for (let i = 0; i < megaData[selMod]["sim_dots"].length; i++) {
         let elem = megaData[selMod]["sim_dots"][i];
 
-        // let theta = ((180 - elem["gt_r"]) < 0 ? Math.abs(180 - elem["gt_r"]) + 180 : (180 - elem["gt_r"]));
         let theta = 360- elem["gt_r"]
-        // console.log(elem["gt_r"]);
-
-        // if (theta < 0) {
-            // theta = theta
-        // }
-
         let id = Math.round(theta / 360 * n_portions) % n_portions;
         res[id].push(elem["id"]) //+= 1
     }
@@ -231,12 +189,6 @@ function makeBars() {
     res = res.concat(gt.map((d, i) => (d.length > 0 ? i : -1)).filter(d => d > -1));
 
     res = res.filter(onlyUnique);
-
-    console.log(res);
-    console.log(sim[res[0]].length);
-    // console.log(res);
-
-
     let stats_bar_scale = d3.scaleLinear().domain(d3.extent(sim.map(d => d.length))).range([0, 80]).clamp(true);
 
     let yland = 120
@@ -333,16 +285,6 @@ function makeBars() {
         .style("transform", (_, i) => "translate(" + (real_anc + i * (barW + margW) + (barW / 2) + 5) + "px," + (yland + 5) + "px) rotate(-85deg)")
         .style("font-weight", '400')
         .text((d) => roomLabels[d])
-    // console.log(temp);
-//
-//
-//     let rect = [[7.3, 2.6], [12.55, 15.9]]
-//
-//     d3.select("#main").append("rect")
-//         .attr("x", mapSaleX(rect[0][0]))
-//         .attr("y", mapScaleY(rect[0][1]))
-//         .attr("width", mapSaleX(rect[1][0]) - mapSaleX(rect[0][0]))
-//         .attr("height", mapScaleY(rect[1][1]) - mapScaleY(rect[0][1]))
 }
 
 
@@ -412,13 +354,12 @@ function in11(x, y) {
 }
 
 function inMid(x, y) {
-    return contains([[7.3, 2.6], [12.55, 15.9]], [x, y]) // ICI
+    return contains([[7.3, 2.6], [12.55, 15.9]], [x, y])
 
 }
 
 function attrib(x, y) {
 
-    // console.log(x + "  --  " + y)
     if (in12(x, y))
         return 12
     if (in2(x, y))
