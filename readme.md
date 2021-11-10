@@ -18,37 +18,39 @@ Work by:  Théo Jaunet, Guillaume Bono, Romain Vuillemot, and Christian Wolf
 
 ## How to install and run locally
 
-Step 1:
-  Clone this repo and install Python dependecies as it follows (you may want to use a vitural environment for that):
+**Step 1:** Clone this repo and install Python dependecies as it follows (you may want to use a vitural environment for that).
 
   ```
   pip install -r requirements.txt
   ```
   
-Step 2:
+  
+  
+**Step 2:** For a direct interaction with models and simulation, this tool requieres both (Habitat-sim + habitat-api) and pytorch
 
-  For a direct interaction with models and simulation, this tool requieres both (Habitat-sim + habitat-api) and pytorch
+   You can follow installation insctructions here:
 
-  You can follow installation insctructions here:
+   - [habitat](https://github.com/facebookresearch/habitat-sim)
+   - [Pytorch](https://pytorch.org/)
 
-  - [habitat](https://github.com/facebookresearch/habitat-sim)
-  - [Pytorch](https://pytorch.org/)
 
-Step 3: 
 
-  Download the virtual environment data in from [this drive](https://drive.google.com/drive/folders/1NihHdUo0d9lc7g7NvY0-3JzJXUCpEChZ?usp=sharing), and move it to <project_dir>/data/
+
+
+**Step 3:** Download the virtual environment data in from [this drive](https://drive.google.com/drive/folders/1NihHdUo0d9lc7g7NvY0-3JzJXUCpEChZ?usp=sharing), and move it to <project_dir>/data/
   
   ```
     mv ~/Downloads/citi.glb data/citi.glb
   ```
   
-Step 4:
   
-  You can launch the server with the script 'server.py' at the root of this repo:
+  
+  
+  
+**Step 4:** You can launch the server with the script 'server.py' at the root of this repo.
   
 ```
 python server.py
 ```
-
 
 The server should then be accessible at: [http://0.0.0.0:5000](http://0.0.0.0:5000) (it may take a minute or two to launch).
