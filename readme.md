@@ -36,7 +36,7 @@ Step 2:
 
 Step 3: 
 
-  Download the virtual environment data in from [this drive](), and move it to <project_dir>/data/
+  Download the virtual environment data in from [this drive](https://drive.google.com/drive/folders/1NihHdUo0d9lc7g7NvY0-3JzJXUCpEChZ?usp=sharing), and move it to <project_dir>/data/
   
   ```
     mv ~/Downloads/citi.glb data/citi.glb
